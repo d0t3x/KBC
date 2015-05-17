@@ -11,6 +11,7 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import kclient.tools.Logger;
 
 /**
  *
@@ -42,6 +43,7 @@ public class UpdateFrame extends JFrame {
         
         this.log = new JTextArea();
         this.log.setEditable(false);
+        Logger.get().info("      Starte Update");
         this.log.append("Starte Update\r\n"
                 + "--------------------------------------------------------------------------------------------------\r\n");
         
@@ -87,6 +89,7 @@ public class UpdateFrame extends JFrame {
     public void addLog(String str) {
         this.log.append(str + "\r\n");
         this.log.setCaretPosition(this.log.getText().length());
+        Logger.get().info("      " + str);
     }
     
 }

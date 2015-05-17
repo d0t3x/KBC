@@ -6,19 +6,13 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.AbstractMap.SimpleEntry;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import kclient.Start;
 import kclient.tools.Logger;
@@ -32,12 +26,14 @@ public class Updater {
     private final Parameter params;
     
     public Updater() {
+        Logger.get().info("  Prüfe auf Updates");
         this.params = new Parameter("http://knds.sebitm.info/kclient/update.properties");
     }
     
     public boolean start() {
         int rev = this.params.getInt("revision");
         if (rev > Start.REVISION) {
+            Logger.get().info("    Update Revision " + rev + " vorhanden");
             StringBuilder msgBuffer = new StringBuilder();
             Map<File, URL> repFiles = new HashMap<>();
             String[] tmpFiles = this.params.get("files").split(";;");
@@ -58,7 +54,7 @@ public class Updater {
                     repFiles.put(repPath, downloadURL);
                     msgBuffer.append("  - ").append(fileData[0]).append("\r\n");
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    Logger.get().error(e);
                 }
             }
             
@@ -93,9 +89,7 @@ public class Updater {
                 }
                 frame.dispose();
                 return this.start();
-            }
-            
-            if (result == 0) {
+            } else if (result == 0) {
                 UpdateFrame frame = new UpdateFrame(rev, repFiles.size());
                 int count = 1;
                 for (Map.Entry<File, URL> updateFile : repFiles.entrySet()) {
@@ -114,7 +108,11 @@ public class Updater {
                 
                 frame.addLog("Bitte starte den Client nun neu.");
                 return false;
+            } else {
+                Logger.get().info("    Update übersprungen");
             }
+        } else {
+            Logger.get().info("    Der Client ist auf dem aktuellsten Stand");
         }
         return true;
     }
